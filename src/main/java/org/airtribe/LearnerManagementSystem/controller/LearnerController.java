@@ -2,7 +2,9 @@ package org.airtribe.LearnerManagementSystem.controller;
 
 import org.airtribe.LearnerManagementSystem.entity.Learner;
 import org.airtribe.LearnerManagementSystem.service.LearnerManagementService;
+import org.airtribe.LearnerManagementSystem.service.LearnerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +34,12 @@ public class LearnerController {
 //    }
     @GetMapping("/learners")
     public List<Learner> fetchLearnerById(@RequestParam(value = "learnerId", required = false) Long  learnerId,
-                                          @RequestParam(value = "learnerName",required = false) Long learnerName){
+                                          @RequestParam(value = "learnerName",required = false) String learnerName) throws LearnerNotFoundException {
         return learnerManagementService.fetchLearnersComplexParams(learnerId, learnerName);
+    }
+
+    @ExceptionHandler(LearnerNotFoundException.class)
+    public ResponseEntity handleLearnerNotFoundException(LearnerNotFoundException e){
+        return ResponseEntity.status(404).body(e.getMessage());
     }
 }

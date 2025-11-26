@@ -1,9 +1,8 @@
 package org.airtribe.LearnerManagementSystem.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Learner {
@@ -15,6 +14,9 @@ public class Learner {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long learnerId;
+
+    @ManyToMany
+    List<Cohort> cohorts;
 
     public Learner(String learnerName, String learnerEmail) {
         this.learnerName = learnerName;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LearnerManagementService {
@@ -20,21 +21,27 @@ public class LearnerManagementService {
         return learnerrepository.findAll();
     }
 
-    public Learner fetchLearnerById(Long learnerId) {
-        return learnerrepository.getById(learnerId);
+    public Learner fetchLearnerById(Long learnerId) throws LearnerNotFoundException {
+        Optional<Learner> learnerOptional = learnerrepository.findById(learnerId);
+        if(learnerOptional.isPresent()) {
+            return learnerOptional.get();
+        }
+        throw new LearnerNotFoundException("Learner not found with id:" + learnerId);
     }
 
     public Learner fetchLearnerByName(String learnerName) {
         return learnerrepository.findByLearnerName(learnerName);
     }
 
-    public List<Learner> fetchLearnersComplexParams(Long learnerId, Long learnerName) {
-        if(learnerId == null && learnerName == null){
-            return fetchAllLearners();
-        }
-        if(learnerId!= null){
+    public List<Learner> fetchLearnersComplexParams(Long learnerId, String learnerName) throws LearnerNotFoundException {
+        if (learnerId != null) {
             return List.of(fetchLearnerById(learnerId));
         }
-        return List.of(fetchLearnerById(learnerName));
+
+        if (learnerName != null){
+            return List.of(fetchLearnerByName(learnerName));
+        }
+
+        return fetchAllLearners();
     }
 }
