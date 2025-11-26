@@ -4,6 +4,12 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+//Indexes are faster for read at the expense of slowing down writes
+//Learners are not composed of cohorts. Cohorts are composed of learners
+//so here defining List of cohorts is part of back referencing. Learners consist back reference to the cohorts
+// Back referencing is done to avoid duplication of 2 join tables which are created in database
+//It is not necessary to add mappedBy but in our usecase we want given a learner we need to know which all cohorts learner is enrolled in.
+
 @Entity
 public class Learner {
 
@@ -15,7 +21,7 @@ public class Learner {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long learnerId;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "learners")
     List<Cohort> cohorts;
 
     public Learner(String learnerName, String learnerEmail) {

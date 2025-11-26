@@ -23,6 +23,7 @@ public class Cohort {
         this.cohortDescription = cohortDescription;
         this.learners = learners;
     }
+    public Cohort() {}
 
     public Long getCohortId() {
         return cohortId;

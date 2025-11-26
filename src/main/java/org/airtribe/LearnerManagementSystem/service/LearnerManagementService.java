@@ -1,6 +1,8 @@
 package org.airtribe.LearnerManagementSystem.service;
 
+import org.airtribe.LearnerManagementSystem.entity.Cohort;
 import org.airtribe.LearnerManagementSystem.entity.Learner;
+import org.airtribe.LearnerManagementSystem.repository.CohortRepository;
 import org.airtribe.LearnerManagementSystem.repository.Learnerrepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,9 @@ import java.util.Optional;
 public class LearnerManagementService {
     @Autowired
     private Learnerrepository learnerrepository;
+
+    @Autowired
+    private CohortRepository cohortRepository;
 
     public Learner createLearner(Learner learner) {
         return learnerrepository.save(learner);
@@ -43,5 +48,41 @@ public class LearnerManagementService {
         }
 
         return fetchAllLearners();
+    }
+
+    public Cohort createCohort(Cohort cohort) {
+        return cohortRepository.save(cohort);
+    }
+
+    public List<Cohort> getAllCohorts() {
+        return cohortRepository.findAll();
+    }
+
+    public Cohort assignLearnersToCohort(Long cohortId, Long learnerId) throws CohortNotFoundException, LearnerNotFoundException {
+        Optional<Cohort> cohortOptional = cohortRepository.findById(cohortId);
+        if(!cohortOptional.isPresent()) {
+            throw new CohortNotFoundException("Cohort not found with id: " + cohortId);
+        }
+        Optional<Learner> optionalLearner = learnerrepository.findById(learnerId);
+        if(!optionalLearner.isPresent()) {
+            throw new LearnerNotFoundException("Learner not found with id: " + learnerId);
+        }
+
+        //If found get the cohort object and assign it to cohort
+        Cohort cohort = cohortOptional.get();
+        // You got cohort object basically it will contain {cohortId,cohortName,learners} right? Initially
+        //existing Learners may be null but how u will get learners is by calling getter function because cohort is an object
+        // refer Cohort Entity to understand this explaination
+        List<Learner> existingLearners = cohort.getLearners();
+        //Since existingLearners are empty at start optionalLearner.get() returns learner object so get it added like below
+        existingLearners.add(optionalLearner.get());
+        return cohortRepository.save(cohort);
+
+        //Now above you have added the learners to cohort and saving what happens next is it would take the cohort
+        //object and automatically maps the relation between 2 entities in the join table(COHORT_LEARNER) which means
+        // as soon as you pass the learner  inside cohort object relationship is automatically created as well why?
+        // because Cohort has many to many relationship with learner, did we create join table explicitly? Then who created
+        //Join table? Spring data jpa created join table. So when you pass the learner object as part of cohort it is the
+        //responsibility of spring data jpa to automatically put the data in relationship table as well.
     }
 }
