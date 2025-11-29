@@ -1,5 +1,8 @@
 package org.airtribe.LearnerManagementSystem.controller;
 
+import org.airtribe.LearnerManagementSystem.dto.CohortDTO;
+import org.airtribe.LearnerManagementSystem.dto.LearnerDTO;
+import org.airtribe.LearnerManagementSystem.entity.Cohort;
 import org.airtribe.LearnerManagementSystem.entity.Learner;
 import org.airtribe.LearnerManagementSystem.service.LearnerManagementService;
 import org.airtribe.LearnerManagementSystem.service.LearnerNotFoundException;
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,9 +37,31 @@ public class LearnerController {
 //        return learnerManagementService.fetchLearnerByName(learnerName);
 //    }
     @GetMapping("/learners")
-    public List<Learner> fetchLearnerById(@RequestParam(value = "learnerId", required = false) Long  learnerId,
-                                          @RequestParam(value = "learnerName",required = false) String learnerName) throws LearnerNotFoundException {
-        return learnerManagementService.fetchLearnersComplexParams(learnerId, learnerName);
+    public List<LearnerDTO> fetchLearnerById(@RequestParam(value = "learnerId", required = false) Long  learnerId,
+                                             @RequestParam(value = "learnerName",required = false) String learnerName) throws LearnerNotFoundException {
+        List<Learner> learnerList =  learnerManagementService.fetchLearnersComplexParams(learnerId, learnerName);
+
+        return parseLearnerListToLearnerDto(learnerList);
+    }
+
+    private List<LearnerDTO> parseLearnerListToLearnerDto(List<Learner> learnerList) {
+        List<LearnerDTO> learnerDTOS = new ArrayList<>();
+        for (Learner learner : learnerList) {
+            LearnerDTO learnerDTO = new LearnerDTO();
+            learnerDTO.setLearnerId(learner.getLearnerId());
+            learnerDTO.setLearnerName(learner.getLearnerName());
+            learnerDTO.setLearnerEmail(learner.getLearnerEmail());
+            learnerDTO.setCohorts(new ArrayList<>());
+            for(Cohort cohort : learner.getCohorts()){
+                CohortDTO cohortDTO = new CohortDTO();
+                cohortDTO.setCohortId(cohort.getCohortId());
+                cohortDTO.setCohortName(cohort.getCohortName());
+                cohortDTO.setCohortDescription(cohort.getCohortDescription());
+                learnerDTO.getCohorts().add(cohortDTO);
+            }
+            learnerDTOS.add(learnerDTO);
+        }
+        return learnerDTOS;
     }
 
     @ExceptionHandler(LearnerNotFoundException.class)
