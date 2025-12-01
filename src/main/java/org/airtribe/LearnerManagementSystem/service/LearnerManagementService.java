@@ -85,4 +85,16 @@ public class LearnerManagementService {
         //Join table? Spring data jpa created join table. So when you pass the learner object as part of cohort it is the
         //responsibility of spring data jpa to automatically put the data in relationship table as well.
     }
+
+    public Cohort assignAndCreateLearnersToCohorts(List<Learner> learners, Long cohortId) throws CohortNotFoundException, LearnerNotFoundException {
+        Optional<Cohort> cohortOptional = cohortRepository.findById(cohortId);
+        if(!cohortOptional.isPresent()) {
+            throw new CohortNotFoundException("Cohort not found with id: "+ cohortId);
+        }
+        Cohort cohort = cohortOptional.get();
+        cohort.getLearners().addAll(learners);
+        //learnerrepository.saveAll(learners); commented because you have written cascade in cohort entity so that learners get automatically created
+        // in learner table
+        return cohortRepository.save(cohort);
+    }
 }

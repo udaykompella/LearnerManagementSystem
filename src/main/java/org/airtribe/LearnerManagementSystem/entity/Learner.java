@@ -2,6 +2,8 @@ package org.airtribe.LearnerManagementSystem.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -14,8 +16,11 @@ import java.util.List;
 @Entity
 public class Learner {
 
+    @NotNull
     private String learnerName;
 
+    @NotNull
+    @Email
     private String learnerEmail;
 
     @Id

@@ -1,5 +1,6 @@
 package org.airtribe.LearnerManagementSystem.controller;
 
+import jakarta.validation.Valid;
 import org.airtribe.LearnerManagementSystem.dto.CohortDTO;
 import org.airtribe.LearnerManagementSystem.dto.LearnerDTO;
 import org.airtribe.LearnerManagementSystem.entity.Cohort;
@@ -7,11 +8,15 @@ import org.airtribe.LearnerManagementSystem.entity.Learner;
 import org.airtribe.LearnerManagementSystem.service.LearnerManagementService;
 import org.airtribe.LearnerManagementSystem.service.LearnerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class LearnerController {
@@ -20,7 +25,7 @@ public class LearnerController {
     private LearnerManagementService learnerManagementService;
 
     @PostMapping("/learners")
-    public Learner createLearner(@RequestBody Learner learner){
+    public Learner createLearner(@Valid  @RequestBody Learner learner){
         return learnerManagementService.createLearner(learner);
     }
 
@@ -67,5 +72,16 @@ public class LearnerController {
     @ExceptionHandler(LearnerNotFoundException.class)
     public ResponseEntity handleLearnerNotFoundException(LearnerNotFoundException e){
         return ResponseEntity.status(404).body(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
+        Map<String,String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((org.springframework.validation.FieldError)error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName,errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

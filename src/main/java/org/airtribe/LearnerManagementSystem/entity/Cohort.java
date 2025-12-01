@@ -14,7 +14,7 @@ public class Cohort {
 
     private String cohortDescription;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     List<Learner> learners;
 
     //Many-to-one relationship can never be backreferenced
