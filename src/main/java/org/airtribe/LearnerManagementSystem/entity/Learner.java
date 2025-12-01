@@ -22,8 +22,6 @@ public class Learner {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long learnerId;
 
-
-
     @ManyToMany(mappedBy = "learners")
     @JsonIgnore
     List<Cohort> cohorts;

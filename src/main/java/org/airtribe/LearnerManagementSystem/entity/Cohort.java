@@ -17,6 +17,11 @@ public class Cohort {
     @ManyToMany
     List<Learner> learners;
 
+    //Many-to-one relationship can never be backreferenced
+    @ManyToOne
+    private Course course;
+    //One cohort will always be mapped to one course
+
     public Cohort(Long cohortId, String cohortName, String cohortDescription, List<Learner> learners) {
         this.cohortId = cohortId;
         this.cohortName = cohortName;
@@ -55,6 +60,14 @@ public class Cohort {
 
     public void setLearners(List<Learner> learners) {
         this.learners = learners;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }
 

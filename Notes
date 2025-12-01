@@ -1,0 +1,9 @@
+How you represent the data in classes is very different from how you represent the data
+in databases
+
+one to many and many to one do not require a join table
+
+In one to many and many to one relationship who is the owner of relationship?
+
+The side which is on many is owning the relationship. In our case it will be Cohort will be owner of courses
+in database because we need to represent the data in normalised way in databases
