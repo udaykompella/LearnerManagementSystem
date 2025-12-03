@@ -5,6 +5,10 @@ import org.airtribe.LearnerManagementSystem.entity.Learner;
 import org.airtribe.LearnerManagementSystem.repository.CohortRepository;
 import org.airtribe.LearnerManagementSystem.repository.Learnerrepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,5 +100,18 @@ public class LearnerManagementService {
         //learnerrepository.saveAll(learners); commented because you have written cascade in cohort entity so that learners get automatically created
         // in learner table
         return cohortRepository.save(cohort);
+    }
+
+    public Page<Cohort> fetchPaginatedCohorts(Integer pageSize, Integer pageNumber, String sortBy, String sortDir) {
+        Sort.Direction direction;
+        if (sortDir.equals("asc")) {
+            direction = Sort.Direction.ASC;
+        } else {
+            direction = Sort.Direction.DESC;
+        }
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        return cohortRepository.findAll(pageable);
     }
 }
